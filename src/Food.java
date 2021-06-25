@@ -1,5 +1,6 @@
 import javafx.scene.paint.Color;
 
+import java.util.List;
 import java.util.Random;
 
 public class Food {
@@ -11,10 +12,11 @@ public class Food {
     private final int X_MIN;
 
     private Coords position;
+    private List<Coords> excludedPositions;
 
     private final Random rand;
 
-    public Food(PixelPainter painter, int pixel_yMax, int pixel_yMin, int pixel_xMax, int pixel_xMin) {
+    public Food(PixelPainter painter, int pixel_yMax, int pixel_yMin, int pixel_xMax, int pixel_xMin, List<Coords> excludedCoords) {
         this.rand = new Random();
 
         this.PAINTER = painter;
@@ -23,6 +25,7 @@ public class Food {
         this.X_MAX = pixel_xMax;
         this.X_MIN = pixel_xMin;
 
+        this.excludedPositions = excludedCoords;
         findNewCoords();
     }
 
@@ -42,5 +45,10 @@ public class Food {
         int xPos = rand.nextInt(X_MAX - X_MIN) + X_MIN;
         int yPos = rand.nextInt(Y_MAX - Y_MIN) + Y_MIN;
         position = new Coords(xPos, yPos);
+        if (excludedPositions.contains(position)) findNewCoords();
+    }
+
+    public void exclude(List<Coords> excludedCoords) {
+        excludedPositions = excludedCoords;
     }
 }

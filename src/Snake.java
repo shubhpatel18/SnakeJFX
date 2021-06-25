@@ -1,6 +1,8 @@
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class Snake {
@@ -100,6 +102,10 @@ public class Snake {
             !(this.dir == Direction.RIGHT && dir == Direction.LEFT)) {
             this.tempDir = dir;
         }
+    }
+
+    public List<Coords> getBody() {
+        return new ArrayList<>(BODY);
     }
 
     public enum Direction {

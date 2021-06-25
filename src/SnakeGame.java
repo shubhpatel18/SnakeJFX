@@ -11,6 +11,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.util.Objects;
+
 public class SnakeGame extends Application {
 
     private final int PIXEL_SIZE = 16;
@@ -31,11 +33,11 @@ public class SnakeGame extends Application {
     private boolean gameStarted;
     private boolean gameWaitingForReset;
 
-    private final Snake snake;
-    private final Food food;
-    private final ScoreBoard score;
+    private final Snake SNAKE;
+    private final Food FOOD;
+    private final ScoreBoard SCORE;
 
-    private final int FOOD_EDGE_SAFETY = 2; // how many pixels food must spawn from the edge
+    private final int FOOD_EDGE_SAFETY = 2; // how many pixels FOOD must spawn from the edge
 
     public static void main(String[] args) {
         launch(args);
@@ -53,9 +55,9 @@ public class SnakeGame extends Application {
         TL = new Timeline(new KeyFrame(Duration.millis(66.66666), e -> run()));
 
         // set up game elements
-        snake = new Snake(PAINTER, WINDOW_PIXEL_HEIGHT - 1, 0, WINDOW_PIXEL_WIDTH - 1, 0);
-        food = new Food(PAINTER, WINDOW_PIXEL_HEIGHT - 1 - FOOD_EDGE_SAFETY, FOOD_EDGE_SAFETY, WINDOW_PIXEL_WIDTH - 1 - FOOD_EDGE_SAFETY, FOOD_EDGE_SAFETY);
-        score = new ScoreBoard(GC, SCORE_TEXT_OFFSET, WINDOW_HEIGHT - SCORE_TEXT_OFFSET);
+        SNAKE = new Snake(PAINTER, WINDOW_PIXEL_HEIGHT - 1, 0, WINDOW_PIXEL_WIDTH - 1, 0);
+        FOOD = new Food(PAINTER, WINDOW_PIXEL_HEIGHT - 1 - FOOD_EDGE_SAFETY, FOOD_EDGE_SAFETY, WINDOW_PIXEL_WIDTH - 1 - FOOD_EDGE_SAFETY, FOOD_EDGE_SAFETY, SNAKE.getBody());
+        SCORE = new ScoreBoard(GC, SCORE_TEXT_OFFSET, WINDOW_HEIGHT - SCORE_TEXT_OFFSET);
     }
 
     public void init() {
@@ -66,8 +68,9 @@ public class SnakeGame extends Application {
     public void start(Stage stage) {
         // set up window
         stage.setTitle("Snake");
-        stage.getIcons().add(new Image(Snake.class.getResourceAsStream("icon.png")));
+        stage.getIcons().add(new Image(Objects.requireNonNull(Snake.class.getResourceAsStream("icon.png"))));
         stage.setScene(new Scene(new StackPane(CANVAS)));
+        stage.setResizable(false);
         stage.show();
 
         // set key listeners
@@ -75,10 +78,10 @@ public class SnakeGame extends Application {
             // any key can start the game
             gameStarted = true;
             switch (e.getCode()) {
-                case UP -> snake.setDir(Snake.Direction.UP);
-                case DOWN -> snake.setDir(Snake.Direction.DOWN);
-                case LEFT -> snake.setDir(Snake.Direction.LEFT);
-                case RIGHT -> snake.setDir(Snake.Direction.RIGHT);
+                case UP, W -> SNAKE.setDir(Snake.Direction.UP);
+                case DOWN, S -> SNAKE.setDir(Snake.Direction.DOWN);
+                case LEFT, A -> SNAKE.setDir(Snake.Direction.LEFT);
+                case RIGHT, D -> SNAKE.setDir(Snake.Direction.RIGHT);
             }
         });
 
@@ -99,9 +102,9 @@ public class SnakeGame extends Application {
             if (gameWaitingForReset) {
                 reset();
             }
-            snake.update(); // update snake location
+            SNAKE.update(); // update SNAKE location
             redraw(); // redraw screen
-            checkCollisions(); // check if snake has eaten the food, or died
+            checkCollisions(); // check if SNAKE has eaten the FOOD, or died
         }
 
     }
@@ -114,18 +117,20 @@ public class SnakeGame extends Application {
     }
 
     public void reset() {
-        snake.reset();
-        food.reset();
-        score.reset();
+        SNAKE.reset();
+        FOOD.exclude(SNAKE.getBody());
+        FOOD.reset();
+        SCORE.reset();
         gameWaitingForReset = false;
     }
 
     public void checkCollisions() {
-        if (snake.hasEaten(food.getCoords())) {
-            snake.grow();
-            food.reset();
-            score.increaseScore();
-        } else if (snake.isDead()) {
+        if (SNAKE.hasEaten(FOOD.getCoords())) {
+            SNAKE.grow();
+            FOOD.exclude(SNAKE.getBody());
+            FOOD.reset();
+            SCORE.increaseScore();
+        } else if (SNAKE.isDead()) {
             promptReset();
         }
     }
@@ -136,8 +141,8 @@ public class SnakeGame extends Application {
         GC.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         // redraw game
-        snake.draw();
-        food.draw();
-        score.draw();
+        SNAKE.draw();
+        FOOD.draw();
+        SCORE.draw();
     }
 }
