@@ -1,6 +1,5 @@
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -105,7 +104,7 @@ public class Snake {
     }
 
     public List<Coords> getBody() {
-        return new ArrayList<>(BODY);
+        return new LinkedList<>(BODY);
     }
 
     public enum Direction {

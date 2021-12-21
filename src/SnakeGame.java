@@ -141,8 +141,8 @@ public class SnakeGame extends Application {
         GC.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         // redraw game
-        SNAKE.draw();
         FOOD.draw();
+        SNAKE.draw();
         SCORE.draw();
     }
 }
